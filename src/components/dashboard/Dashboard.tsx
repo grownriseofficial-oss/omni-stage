@@ -4,8 +4,20 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Users, DollarSign, TrendingUp, Target, Plus, ArrowUpRight } from 'lucide-react';
 import { crmStore } from '@/services/crmStore';
+import { LeadsManager } from "@/components/crm/LeadsManager";
+import { DealsKanban } from "@/components/crm/DealsKanban";
+import { ContactsManager } from "@/components/crm/ContactsManager";
+import { WorkflowEngine } from "@/components/workflows/WorkflowEngine";
 
-export const Dashboard: React.FC = () => {
+interface DashboardProps {
+  activeView?: string;
+}
+
+export const Dashboard: React.FC<DashboardProps> = ({ activeView = "dashboard" }) => {
+  if (activeView === "leads") return <LeadsManager />;
+  if (activeView === "deals") return <DealsKanban />;
+  if (activeView === "contacts") return <ContactsManager />;
+  if (activeView === "workflows") return <WorkflowEngine />;
   const metrics = crmStore.getDashboardMetrics();
   const leads = crmStore.getLeads().slice(0, 5);
   const deals = crmStore.getDeals().slice(0, 5);
