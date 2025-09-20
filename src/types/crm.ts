@@ -101,6 +101,7 @@ export interface Lead extends BaseEntity {
   converted_to_deal_id?: string;
   custom_fields: Record<string, any>;
   tags: string[];
+  notes?: string;
 }
 
 export interface Contact extends BaseEntity {

@@ -473,6 +473,17 @@ class CRMStore {
     return lead;
   }
 
+  addLead(leadData: Omit<Lead, 'id' | 'created_at' | 'updated_at' | 'created_by' | 'updated_by' | 'owner_id' | 'custom_fields' | 'tags' | 'company_id'>): Lead {
+    const { user } = this.requireAuth();
+    
+    return this.createLead({
+      ...leadData,
+      owner_id: user.id,
+      custom_fields: {},
+      tags: [],
+    });
+  }
+
   updateLead(id: string, updates: Partial<Lead>): Lead {
     const { user } = this.requireAuth();
     const leads = this.loadFromStorage<Lead>(STORAGE_KEYS.LEADS);
