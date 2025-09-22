@@ -5,7 +5,8 @@ import { Badge } from '@/components/ui/badge';
 import { 
   LayoutDashboard, Users, Building2, DollarSign, UserPlus, 
   BarChart3, Settings, LogOut, Bell, Search, ChevronDown,
-  Target, Calendar, Mail, FileText, Workflow, Zap
+  Target, Calendar, Mail, FileText, Workflow, Zap, CheckSquare,
+  MessageCircle, StickyNote
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { User, Company } from '@/types/crm';
@@ -39,6 +40,9 @@ const navigationItems = [
     group: 'Activities',
     items: [
       { id: 'activities', label: 'Activities', icon: Calendar, badge: '3' },
+      { id: 'tasks', label: 'Tasks', icon: CheckSquare, badge: '5' },
+      { id: 'notes', label: 'Notes', icon: StickyNote, badge: null },
+      { id: 'communications', label: 'Communications', icon: MessageCircle, badge: null },
       { id: 'emails', label: 'Email Center', icon: Mail, badge: null },
       { id: 'reports', label: 'Reports', icon: FileText, badge: null },
     ]

@@ -8,6 +8,9 @@ import { LeadsManager } from "@/components/crm/LeadsManager";
 import { DealsKanban } from "@/components/crm/DealsKanban";
 import { ContactsManager } from "@/components/crm/ContactsManager";
 import { WorkflowEngine } from "@/components/workflows/WorkflowEngine";
+import { TaskManager } from "@/components/crm/TaskManager";
+import { NotesManager } from "@/components/crm/NotesManager";
+import { CommunicationHistory } from "@/components/crm/CommunicationHistory";
 
 interface DashboardProps {
   activeView?: string;
@@ -18,6 +21,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ activeView = "dashboard" }
   if (activeView === "deals") return <DealsKanban />;
   if (activeView === "contacts") return <ContactsManager />;
   if (activeView === "workflows") return <WorkflowEngine />;
+  if (activeView === "tasks") return <TaskManager />;
+  if (activeView === "notes") return <NotesManager />;
+  if (activeView === "communications") return <CommunicationHistory />;
   const metrics = crmStore.getDashboardMetrics();
   const leads = crmStore.getLeads().slice(0, 5);
   const deals = crmStore.getDeals().slice(0, 5);
