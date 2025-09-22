@@ -11,6 +11,10 @@ import { WorkflowEngine } from "@/components/workflows/WorkflowEngine";
 import { TaskManager } from "@/components/crm/TaskManager";
 import { NotesManager } from "@/components/crm/NotesManager";
 import { CommunicationHistory } from "@/components/crm/CommunicationHistory";
+import { AdvancedAnalytics } from "@/components/analytics/AdvancedAnalytics";
+import { EmailAutomation } from "@/components/email/EmailAutomation";
+import { FileManager } from "@/components/files/FileManager";
+import { UserManagement } from "@/components/users/UserManagement";
 
 interface DashboardProps {
   activeView?: string;
@@ -24,6 +28,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ activeView = "dashboard" }
   if (activeView === "tasks") return <TaskManager />;
   if (activeView === "notes") return <NotesManager />;
   if (activeView === "communications") return <CommunicationHistory />;
+  if (activeView === "analytics") return <AdvancedAnalytics />;
+  if (activeView === "emails") return <EmailAutomation />;
+  if (activeView === "files") return <FileManager />;
+  if (activeView === "users") return <UserManagement />;
   const metrics = crmStore.getDashboardMetrics();
   const leads = crmStore.getLeads().slice(0, 5);
   const deals = crmStore.getDeals().slice(0, 5);

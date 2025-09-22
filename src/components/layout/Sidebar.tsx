@@ -6,7 +6,7 @@ import {
   LayoutDashboard, Users, Building2, DollarSign, UserPlus, 
   BarChart3, Settings, LogOut, Bell, Search, ChevronDown,
   Target, Calendar, Mail, FileText, Workflow, Zap, CheckSquare,
-  MessageCircle, StickyNote
+  MessageCircle, StickyNote, Upload, Shield, PieChart
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { User, Company } from '@/types/crm';
@@ -24,7 +24,7 @@ const navigationItems = [
     group: 'Overview',
     items: [
       { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, badge: null },
-      { id: 'analytics', label: 'Analytics', icon: BarChart3, badge: null },
+      { id: 'analytics', label: 'Advanced Analytics', icon: PieChart, badge: null },
     ]
   },
   {
@@ -48,8 +48,9 @@ const navigationItems = [
     ]
   },
   {
-    group: 'Automation',
+    group: 'Tools',
     items: [
+      { id: 'files', label: 'File Manager', icon: Upload, badge: null },
       { id: 'workflows', label: 'Workflows', icon: Workflow, badge: null },
       { id: 'integrations', label: 'Integrations', icon: Zap, badge: null },
     ]
@@ -57,6 +58,7 @@ const navigationItems = [
   {
     group: 'Administration',
     items: [
+      { id: 'users', label: 'User Management', icon: Shield, badge: null },
       { id: 'settings', label: 'Settings', icon: Settings, badge: null },
     ]
   },
