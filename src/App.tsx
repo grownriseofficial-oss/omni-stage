@@ -10,6 +10,7 @@ import Deals from "./pages/Deals";
 import Contacts from "./pages/Contacts";
 import Workflows from "./pages/Workflows";
 import Activities from "./pages/Activities";
+import Tasks from "./pages/Tasks";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
 import Landing from "./pages/Landing";
@@ -42,6 +43,7 @@ const App = () => (
           <Route path="/contacts" element={<Contacts />} />
           <Route path="/workflows" element={<Workflows />} />
           <Route path="/activities" element={<Activities />} />
+          <Route path="/tasks" element={<Tasks />} />
           <Route path="/reports" element={<Reports />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/billing" element={<Billing />} />

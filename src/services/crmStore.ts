@@ -1,11 +1,79 @@
-// In-Memory CRM Data Store with localStorage persistence
+// Enhanced In-Memory CRM Data Store with localStorage persistence
 
 import { 
   Company, User, Lead, Contact, Account, Deal, Pipeline, PipelineStage, 
   Activity, CustomField, WorkflowTemplate, Dashboard, AuditLog, UserRole 
 } from '@/types/crm';
 
-// Storage keys
+// Additional types for enhanced SaaS features
+export interface Task extends Activity {
+  priority: 'high' | 'medium' | 'low';
+  completed: boolean;
+  assignee_id: string;
+  notes: string;
+}
+
+export interface TeamMember {
+  id: string;
+  company_id: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  avatar: string;
+  role: 'company_admin' | 'sales_manager' | 'sales_rep' | 'user';
+  department: string;
+  title: string;
+  phone: string;
+  status: 'active' | 'inactive' | 'pending';
+  is_active: boolean;
+  last_login: Date;
+  created_at: Date;
+  updated_at: Date;
+  created_by: string;
+  updated_by: string;
+  permissions: {
+    leads: boolean;
+    deals: boolean;
+    contacts: boolean;
+    reports: boolean;
+    settings: boolean;
+  };
+  achievements?: string[];
+  quota?: number;
+}
+
+export interface Integration {
+  id: string;
+  name: string;
+  category: string;
+  description: string;
+  icon: string;
+  status: 'connected' | 'available' | 'error';
+  features: string[];
+  config?: Record<string, any>;
+}
+
+export interface Subscription {
+  id: string;
+  plan: 'starter' | 'professional' | 'enterprise';
+  status: 'active' | 'cancelled' | 'past_due';
+  current_period_start: Date;
+  current_period_end: Date;
+  price: number;
+  features: string[];
+  usage: {
+    leads: number;
+    users: number;
+    storage: number;
+  };
+  limits: {
+    leads: number;
+    users: number;
+    storage: number;
+  };
+}
+
+// Enhanced storage keys
 const STORAGE_KEYS = {
   COMPANIES: 'crm_companies',
   USERS: 'crm_users',
@@ -22,6 +90,12 @@ const STORAGE_KEYS = {
   AUDIT_LOGS: 'crm_audit_logs',
   CURRENT_USER: 'crm_current_user',
   CURRENT_COMPANY: 'crm_current_company',
+  TASKS: 'crm_tasks',
+  TEAM_MEMBERS: 'crm_team_members',
+  INTEGRATIONS: 'crm_integrations',
+  SUBSCRIPTIONS: 'crm_subscriptions',
+  EMAIL_TEMPLATES: 'crm_email_templates',
+  FILES: 'crm_files',
 } as const;
 
 // Utility functions
@@ -595,6 +669,144 @@ class CRMStore {
       wonDealValue,
       averageDealSize: totalDeals > 0 ? totalDealValue / totalDeals : 0,
       salesReps: users.filter(u => u.role === 'sales_rep').length,
+    };
+  }
+
+  // Enhanced Task Management
+  getTasks(): Task[] {
+    return this.filterByCompany(this.loadFromStorage<Task>(STORAGE_KEYS.TASKS));
+  }
+
+  createTask(taskData: Omit<Task, 'id' | 'company_id' | 'created_at' | 'updated_at' | 'created_by' | 'updated_by'>): Task {
+    const { user, company } = this.requireAuth();
+    
+    const task: Task = {
+      id: generateId(),
+      company_id: company.id,
+      type: 'task',
+      created_at: now(),
+      updated_at: now(),
+      created_by: user.id,
+      updated_by: user.id,
+      priority: 'medium',
+      completed: false,
+      assignee_id: user.id,
+      notes: '',
+      ...taskData,
+    };
+
+    const tasks = this.loadFromStorage<Task>(STORAGE_KEYS.TASKS);
+    tasks.push(task);
+    this.saveToStorage(STORAGE_KEYS.TASKS, tasks);
+    return task;
+  }
+
+  updateTask(id: string, updates: Partial<Task>): Task | null {
+    const { user } = this.requireAuth();
+    const tasks = this.loadFromStorage<Task>(STORAGE_KEYS.TASKS);
+    const index = tasks.findIndex(t => t.id === id && t.company_id === this.currentCompany?.id);
+    
+    if (index === -1) return null;
+    
+    tasks[index] = { ...tasks[index], ...updates, updated_at: now(), updated_by: user.id };
+    this.saveToStorage(STORAGE_KEYS.TASKS, tasks);
+    return tasks[index];
+  }
+
+  // Team Management
+  getTeamMembers(): TeamMember[] {
+    return this.filterByCompany(this.loadFromStorage<TeamMember>(STORAGE_KEYS.TEAM_MEMBERS));
+  }
+
+  createTeamMember(memberData: Omit<TeamMember, 'id' | 'company_id' | 'created_at' | 'updated_at' | 'created_by' | 'updated_by'>): TeamMember {
+    const { user, company } = this.requireAuth();
+    
+    const member: TeamMember = {
+      id: generateId(),
+      company_id: company.id,
+      created_at: now(),
+      updated_at: now(),
+      created_by: user.id,
+      updated_by: user.id,
+      is_active: true,
+      permissions: {
+        leads: true,
+        deals: true,
+        contacts: true,
+        reports: false,
+        settings: false,
+      },
+      ...memberData,
+    };
+
+    const members = this.loadFromStorage<TeamMember>(STORAGE_KEYS.TEAM_MEMBERS);
+    members.push(member);
+    this.saveToStorage(STORAGE_KEYS.TEAM_MEMBERS, members);
+    return member;
+  }
+
+  // Integration Management
+  getIntegrations(): Integration[] {
+    const baseIntegrations: Integration[] = [
+      {
+        id: '1',
+        name: 'Slack',
+        category: 'Communication',
+        description: 'Get notifications and updates in Slack channels',
+        icon: '💬',
+        status: 'available',
+        features: ['Notifications', 'Deal Updates', 'Team Collaboration'],
+      },
+      {
+        id: '2',
+        name: 'Google Workspace',
+        category: 'Productivity',
+        description: 'Sync with Gmail, Calendar, and Drive',
+        icon: '📧',
+        status: 'connected',
+        features: ['Email Sync', 'Calendar Integration', 'File Storage'],
+      },
+      {
+        id: '3',
+        name: 'Stripe',
+        category: 'Payments',
+        description: 'Process payments and track revenue',
+        icon: '💳',
+        status: 'available',
+        features: ['Payment Processing', 'Revenue Tracking', 'Invoicing'],
+      },
+    ];
+
+    const userIntegrations = this.loadFromStorage<Integration>(STORAGE_KEYS.INTEGRATIONS);
+    return [...baseIntegrations, ...userIntegrations];
+  }
+
+  // Subscription Management
+  getSubscription(): Subscription {
+    const subscriptions = this.loadFromStorage<Subscription>(STORAGE_KEYS.SUBSCRIPTIONS);
+    const companySubscription = subscriptions.find(s => s.id === this.currentCompany?.id);
+    
+    if (companySubscription) return companySubscription;
+    
+    // Default subscription
+    return {
+      id: this.currentCompany?.id || 'default',
+      plan: 'professional',
+      status: 'active',
+      current_period_start: new Date(),
+      current_period_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      price: 49,
+      features: ['Unlimited Leads', 'Advanced Analytics', 'Email Automation', 'API Access'],
+      usage: {
+        leads: this.getLeads().length,
+        users: this.getTeamMembers().length,
+        storage: 2.1,
+      },
+      limits: {
+        leads: 10000,
+        users: 25,
+        storage: 100,
+      },
     };
   }
 }
